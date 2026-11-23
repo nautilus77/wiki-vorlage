@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // Diff-Wächter: prüft die Änderungen zwischen zwei Git-Referenzen im aktuellen Repo, bevor eine automatische Einarbeitung
 // veröffentlicht wird (und in CI nach jedem Push).
-// Aufruf: wiki-diffwaechter <base> <head>
+// Aufruf: wiki-diffwaechter [--nur-ki-autoren <wiki.json>] <base> <head>
+// --nur-ki-autoren (CI, F27 vom 23.11.2026): geprüft werden nur Commits, deren Autor-E-Mail in ki_autoren der wiki.json
+//    steht (Server/Bot), jeder einzeln gegen seinen Vorgänger; Commits des Betreibers bleiben frei (D59 F8).
+//    Fehlt ki_autoren oder kommt kein KI-Commit vor → übersprungen (Exit 0, mit Hinweis). wiki.json nicht lesbar → Exit 2.
 // 1. Pfade: erlaubt sind nur Dateien unter wiki/ und projekt/eingang-register.md (hinzufügen, ändern, löschen).
 //    Alles andere (Regeln, Werkzeuge, Workflows, package*.json, wiki.json …) wird abgelehnt.
 // 2. Namen: hinzugefügte Zeilen in erlaubten Dateien dürfen keinen Klarnamen aus der Pseudonym-Liste enthalten.
@@ -89,6 +92,13 @@ export function pruefeDiff(base, head, { muster = null } = {}) {
   return verstoesse;
 }
 
+// Commits (ohne Merges) im Bereich base..head, deren Autor in autoren steht (Groß/klein egal), älteste zuerst
+export function kiCommits(base, head, autoren) {
+  const menge = new Set(autoren.map((a) => a.toLowerCase()));
+  return git('log', '--no-merges', '--reverse', '--format=%H %ae', `${base}..${head}`).split('\n').filter(Boolean)
+    .map((z) => z.split(' ')).filter(([, mail]) => menge.has((mail ?? '').toLowerCase())).map(([h]) => h);
+}
+
 const istHauptprogramm = (url) => {
   try {
     return Boolean(process.argv[1]) && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(url));
@@ -98,10 +108,29 @@ const istHauptprogramm = (url) => {
 };
 
 if (istHauptprogramm(import.meta.url)) {
-  const [base, head, ...rest] = process.argv.slice(2);
-  if (!base || !head || rest.length) {
-    console.error('Aufruf: wiki-diffwaechter <base> <head>   (Git-Referenzen im aktuellen Repo; Namensliste in $PSEUDO_LISTE)');
+  const argumente = process.argv.slice(2);
+  let configDatei = null;
+  if (argumente[0] === '--nur-ki-autoren') {
+    configDatei = argumente[1];
+    argumente.splice(0, 2);
+  }
+  const [base, head, ...rest] = argumente;
+  if (!base || !head || rest.length || configDatei === undefined) {
+    console.error('Aufruf: wiki-diffwaechter [--nur-ki-autoren <wiki.json>] <base> <head>   (Git-Referenzen im aktuellen Repo; Namensliste in $PSEUDO_LISTE)');
     process.exit(2);
+  }
+  let autoren = null;
+  if (configDatei) {
+    try {
+      autoren = JSON.parse(readFileSync(configDatei, 'utf8')).ki_autoren ?? [];
+    } catch (e) {
+      console.error(`wiki.json nicht lesbar (${configDatei}): ${e.code ?? e.message}`);
+      process.exit(2);
+    }
+    if (!Array.isArray(autoren) || !autoren.length) {
+      console.log(`Hinweis: keine ki_autoren in ${configDatei} – Diff-Wächter übersprungen.`);
+      process.exit(0);
+    }
   }
   let muster = null;
   const liste = process.env.PSEUDO_LISTE;
@@ -117,7 +146,16 @@ if (istHauptprogramm(import.meta.url)) {
   }
   let verstoesse;
   try {
-    verstoesse = pruefeDiff(base, head, { muster });
+    if (autoren) {
+      const commits = kiCommits(base, head, autoren);
+      if (!commits.length) {
+        console.log(`Hinweis: kein Commit von KI-Autoren in ${base}..${head} – Diff-Wächter übersprungen (Korrekturen des Betreibers sind frei).`);
+        process.exit(0);
+      }
+      verstoesse = commits.flatMap((c) => pruefeDiff(`${c}^`, c, { muster }).map((v) => ({ ...v, meldung: `${v.meldung} (Commit ${c.slice(0, 7)})` })));
+    } else {
+      verstoesse = pruefeDiff(base, head, { muster });
+    }
   } catch (e) {
     console.error(`Prüfung nicht möglich: ${e.message}`);
     process.exit(2);

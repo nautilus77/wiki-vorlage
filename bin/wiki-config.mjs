@@ -8,13 +8,15 @@
 //   eingang.lokal    Arbeitskopie des Eingangs, relativ zur Wiki-Wurzel (z. B. ../eingang)
 //   register         Register der eingearbeiteten Eingangsdateien, relativ im Repo (z. B. projekt/eingang-register.md)
 //   zielmodus        „direkt-main“ (Push nach Diff-Wächter direkt auf main) | „pr-automerge“ (Zweig + Pull Request mit Automerge)
+//   ki_autoren       optional: Autor-E-Mails der automatischen Einarbeitung (Server/Bot); nur deren Commits prüft der
+//                    Diff-Wächter in CI (F27), Korrekturen des Betreibers bleiben frei
 //   pseudonym_liste.quelle  Ort der Zuordnungsliste „Klarname => Pseudonym“ (nie im Repo), rclone-Stil
 import { readFileSync, realpathSync } from 'node:fs';
 import { isAbsolute, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ZIELMODI = ['direkt-main', 'pr-automerge'];
-const FELDER = ['name', 'betreiber', 'eingang', 'register', 'zielmodus', 'pseudonym_liste'];
+const FELDER = ['name', 'betreiber', 'eingang', 'register', 'zielmodus', 'pseudonym_liste', 'ki_autoren'];
 const RCLONE = /^[A-Za-z0-9_][A-Za-z0-9_. -]*:\S.*$/;
 const KENNUNG = /^[a-z0-9][a-z0-9._-]*$/;
 
@@ -36,6 +38,8 @@ export function pruefeConfig(c) {
   }
   if (!relativImRepo(c.register)) f.push('register: fehlt oder kein relativer Pfad im Repo');
   if (!ZIELMODI.includes(c.zielmodus)) f.push(`zielmodus: „${c.zielmodus ?? '–'}“ nicht erlaubt (${ZIELMODI.join(' | ')})`);
+  if (c.ki_autoren !== undefined && !(Array.isArray(c.ki_autoren) && c.ki_autoren.every((a) => typeof a === 'string' && /^[^\s@]+@[^\s@]+$/.test(a))))
+    f.push('ki_autoren: Liste von E-Mail-Adressen (Autoren der automatischen Einarbeitung)');
   if (!istObjekt(c.pseudonym_liste)) f.push('pseudonym_liste: fehlt (Objekt mit quelle)');
   else {
     if (typeof c.pseudonym_liste.quelle !== 'string' || !RCLONE.test(c.pseudonym_liste.quelle)) f.push('pseudonym_liste.quelle: im rclone-Stil „remote:pfad“ angeben');

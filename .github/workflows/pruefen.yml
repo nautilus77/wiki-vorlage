@@ -4,7 +4,8 @@
 #     pruefen:
 #       uses: nautilus77/wiki-vorlage/.github/workflows/pruefen.yml@v1.0.0
 # Prüft: Prüfskript (ohne Eingang, den gibt es in CI nicht), Regelkern in AGENTS.md, wiki.json; bei Push zusätzlich den
-# Diff-Wächter für before..after (nur der Pfadteil – die Pseudonym-Liste liegt nie in GitHub).
+# Diff-Wächter für before..after (nur der Pfadteil – die Pseudonym-Liste liegt nie in GitHub), und zwar nur für Commits der
+# ki_autoren aus wiki.json (F27, 23.11.2026); Korrekturen des Betreibers bleiben frei.
 name: Wiki prüfen
 
 on:
@@ -37,10 +38,10 @@ jobs:
         run: npx --no-install wiki-regelkern --pruefen AGENTS.md
       - name: wiki.json
         run: npx --no-install wiki-config pruefen wiki.json
-      - name: Diff-Wächter (Push, nur Pfade)
+      - name: Diff-Wächter (Push, nur KI-Commits, nur Pfade)
         if: github.event_name == 'push' && inputs.diffwaechter && github.event.before != '0000000000000000000000000000000000000000'
         env:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.event.after }}
           PSEUDO_LISTE: ""
-        run: npx --no-install wiki-diffwaechter "$BEFORE" "$AFTER"
+        run: npx --no-install wiki-diffwaechter --nur-ki-autoren wiki.json "$BEFORE" "$AFTER"

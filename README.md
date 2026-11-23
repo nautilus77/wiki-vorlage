@@ -12,7 +12,7 @@ Dieses Repo enthält keine Inhalte, keine Namen und keine privaten Orte.
 |---|---|
 | `bin/wiki-pruefen.mjs` | Prüfskript: OKF v0.2 und die festen Regeln des Regelkerns (`--json`, `--ohne-eingang` für CI) |
 | `bin/wiki-projektstand.mjs` | Projektstand: Prüfskript, Standards, offener Eingang laut Register, Zahlen → `projekt/status.md` |
-| `bin/wiki-diffwaechter.mjs` | Diff-Wächter `<base> <head>`: nur `wiki/` und `projekt/eingang-register.md`, keine Klarnamen aus `$PSEUDO_LISTE` |
+| `bin/wiki-diffwaechter.mjs` | Diff-Wächter `[--nur-ki-autoren wiki.json] <base> <head>`: nur `wiki/` und `projekt/eingang-register.md`, keine Klarnamen aus `$PSEUDO_LISTE`; in CI nur Commits der `ki_autoren` aus wiki.json (Betreiber-Korrekturen frei) |
 | `bin/wiki-regelkern.mjs` | Regelkern als Kopie zwischen Markern in die AGENTS.md schreiben (`--schreiben`) oder abgleichen (`--pruefen`) |
 | `bin/wiki-config.mjs` | `wiki-config pruefen wiki.json` |
 | `regeln/AGENTS-kern.md` | gemeinsamer Regelkern samt modellneutralem Ablauf für Einarbeiten (Ingest) und Projektstand (Lint) |
@@ -33,7 +33,7 @@ Dieses Repo enthält keine Inhalte, keine Namen und keine privaten Orte.
     "projektstand": "wiki-projektstand"
   },
   "dependencies": {
-    "wiki-vorlage": "github:nautilus77/wiki-vorlage#v1.0.0"
+    "wiki-vorlage": "github:nautilus77/wiki-vorlage#v1.0.1"
   }
 }
 ```
@@ -47,7 +47,7 @@ on:
     branches: [main]
 jobs:
   pruefen:
-    uses: nautilus77/wiki-vorlage/.github/workflows/pruefen.yml@v1.0.0
+    uses: nautilus77/wiki-vorlage/.github/workflows/pruefen.yml@v1.0.1
 ```
 
 Skills für Claude Code: `/plugin marketplace add nautilus77/wiki-vorlage`, dann `/plugin install wiki@wiki-vorlage`.

@@ -1,6 +1,6 @@
 {
   "name": "wiki-vorlage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Werkzeuge und gemeinsame Regeln für Wikis nach OKF v0.2 und Karpathys LLM-Wiki: Prüfskript, Projektstand, Diff-Wächter, Regelkern für AGENTS.md, Prüfung von wiki.json",
   "license": "MIT",
   "type": "module",
