@@ -1,0 +1,24 @@
+{
+  "standards": [
+    {
+      "name": "Karpathy LLM Wiki",
+      "url": "https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f",
+      "abruf": "https://gist.githubusercontent.com/karpathy/442a6bf555914893e9891c11519de94f/raw",
+      "version": null,
+      "sha256": "dc3efe98ae62f23dd08acad13aba2e95287beb20b6bec2f4af0423557fe37401",
+      "hinweis": "Gist ohne Versionsnummer: Vergleich über die Prüfsumme (sha256) des Rohinhalts",
+      "geprueft_am": "2026-10-06T09:52:09+02:00"
+    },
+    {
+      "name": "Open Knowledge Format",
+      "url": "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md",
+      "abruf": "https://raw.githubusercontent.com/GoogleCloudPlatform/knowledge-catalog/refs/heads/main/okf/SPEC.md",
+      "version": "0.2",
+      "commit": "62432a0",
+      "commit_datum": "2026-08-21T01:44:53Z",
+      "geprueft_am": "2026-10-06T09:52:09+02:00",
+      "sha256": "26aa5da029278939f914e578107242d9607d4f2dc5fe153272b82f9ed1030101",
+      "commits_api": "https://api.github.com/repos/GoogleCloudPlatform/knowledge-catalog/commits?path=okf/SPEC.md&per_page=1"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "wiki-vorlage",
+  "owner": {
+    "name": "nautilus77"
+  },
+  "metadata": {
+    "description": "Skills für Wikis nach wiki-vorlage (OKF v0.2, Karpathy LLM Wiki)"
+  },
+  "plugins": [
+    {
+      "name": "wiki",
+      "source": "./plugins/wiki",
+      "description": "Skills /eingang und /projektstand für Wikis nach wiki-vorlage; der Ablauf steht in der AGENTS.md des Wikis",
+      "version": "1.0.0"
+    }
+  ]
+}

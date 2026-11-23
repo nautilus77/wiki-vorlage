@@ -1,0 +1,13 @@
+{
+  "name": "beispiel-wissen",
+  "betreiber": "betreiber",
+  "eingang": {
+    "quelle": "nextcloud:Wiki/eingang",
+    "lokal": "../eingang"
+  },
+  "register": "projekt/eingang-register.md",
+  "zielmodus": "pr-automerge",
+  "pseudonym_liste": {
+    "quelle": "nextcloud:Wiki/ablage/pseudonyme.txt"
+  }
+}

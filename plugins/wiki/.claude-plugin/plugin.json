@@ -1,0 +1,9 @@
+{
+  "name": "wiki",
+  "version": "1.0.0",
+  "description": "Skills /eingang und /projektstand für Wikis nach wiki-vorlage; der Ablauf steht in der AGENTS.md des Wikis",
+  "license": "MIT",
+  "author": {
+    "name": "nautilus77"
+  }
+}

@@ -1,0 +1,46 @@
+# Wiederverwendbarer Prüf-Workflow für Wikis nach wiki-vorlage.
+# Aufruf aus einem Wiki (Version fest wie in package.json):
+#   jobs:
+#     pruefen:
+#       uses: nautilus77/wiki-vorlage/.github/workflows/pruefen.yml@v1.0.0
+# Prüft: Prüfskript (ohne Eingang, den gibt es in CI nicht), Regelkern in AGENTS.md, wiki.json; bei Push zusätzlich den
+# Diff-Wächter für before..after (nur der Pfadteil – die Pseudonym-Liste liegt nie in GitHub).
+name: Wiki prüfen
+
+on:
+  workflow_call:
+    inputs:
+      diffwaechter:
+        description: "Bei Push den Diff-Wächter für before..after laufen lassen"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Werkzeuge installieren
+        run: npm ci --no-audit --no-fund
+      - name: Prüfskript
+        run: npx --no-install wiki-pruefen --ohne-eingang
+      - name: Regelkern in AGENTS.md
+        run: npx --no-install wiki-regelkern --pruefen AGENTS.md
+      - name: wiki.json
+        run: npx --no-install wiki-config pruefen wiki.json
+      - name: Diff-Wächter (Push, nur Pfade)
+        if: github.event_name == 'push' && inputs.diffwaechter && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          PSEUDO_LISTE: ""
+        run: npx --no-install wiki-diffwaechter "$BEFORE" "$AFTER"

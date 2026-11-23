@@ -1,0 +1,28 @@
+{
+  "name": "wiki-vorlage",
+  "version": "1.0.0",
+  "description": "Werkzeuge und gemeinsame Regeln für Wikis nach OKF v0.2 und Karpathys LLM-Wiki: Prüfskript, Projektstand, Diff-Wächter, Regelkern für AGENTS.md, Prüfung von wiki.json",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "bin": {
+    "wiki-pruefen": "bin/wiki-pruefen.mjs",
+    "wiki-projektstand": "bin/wiki-projektstand.mjs",
+    "wiki-diffwaechter": "bin/wiki-diffwaechter.mjs",
+    "wiki-regelkern": "bin/wiki-regelkern.mjs",
+    "wiki-config": "bin/wiki-config.mjs"
+  },
+  "files": [
+    "bin/",
+    "regeln/",
+    "beispiel/"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
+  }
+}
